@@ -15,7 +15,7 @@ class CONFIG:
     num_threads : int = 4
 
 
-url = 'https://www.amazon.in/Sunfeast-Yumfills-Whoopie-Chocolate-Chip/dp/B06WGM2HK2'
+url = 'https://www.amazon.in/Quaker-Oats-Pouch-1kg/dp/B00QPS8BAW'
 
 
 def driver_setup() -> webdriver.Chrome: 
@@ -50,10 +50,16 @@ def product_image(driver, url :str, thread : int) -> str | None:
 
 
 def main():
-    config = CONFIG(url = url, num_threads= 8)
+    config = CONFIG(url = url, num_threads= 9)
+    drivers = []
 
     starti = time.perf_counter()
-    drivers = [driver_setup() for _ in range(config.num_threads)]
+    with ThreadPoolExecutor(max_workers=config.num_threads) as excecutor:
+        futures = [excecutor.submit(driver_setup) for _ in range(config.num_threads)]
+        
+        for future in futures:
+            drivers.append(future.result())
+
     endi = time.perf_counter()
 
 

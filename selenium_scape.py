@@ -38,8 +38,8 @@ def driver_setup():
 
 def scrape_amazon(driver, url : str):
     driver.get(url)
-    wait = WebDriverWait(driver, 5)
-    element = wait.until(EC.presence_of_element_located((By.ID, "imgTagWrapperId")))
+    time.sleep(1)
+    element = driver.find_element(By.ID, "imgTagWrapperId")
     img_link = element.find_element(By.TAG_NAME, "img").get_attribute('src')
     return img_link
 

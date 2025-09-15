@@ -13,9 +13,10 @@ from concurrent.futures import ThreadPoolExecutor
 class CONFIG:
     url : str
     num_threads : int = 4
+    max_threads : int = 12
 
 
-url = 'https://www.amazon.in/Quaker-Oats-Pouch-1kg/dp/B00QPS8BAW'
+url = 'https://www.amazon.in/iPhone-16-128-GB-Control/dp/B0DGHZWBYB'
 
 
 def driver_setup() -> webdriver.Chrome: 
@@ -49,9 +50,10 @@ def product_image(driver, url :str, thread : int) -> str | None:
     return img_url
 
 
-def main():
-    config = CONFIG(url = url, num_threads= 9)
+def getImage(url : str, num_threads : int = 4) -> list:
+    config = CONFIG(url = url, num_threads= num_threads)
     drivers = []
+    imgUrls = []
 
     starti = time.perf_counter()
     with ThreadPoolExecutor(max_workers=config.num_threads) as excecutor:
@@ -68,12 +70,15 @@ def main():
         futures = [excecutor.submit(product_image, drivers[i], config.url, i) for i in range(config.num_threads)]
 
         for future in futures:
-            print(future.result())
+            imgUrls.append(future.result())
+
     endp = time.perf_counter()
 
     print(f"INITIALIZATION TIME: {endi - starti}")
     print(f"PROCESSING TIME: {endp-startp}")
+    return imgUrls
+
 
 if __name__ == "__main__":
-    main()
+    getImage(url)
 

@@ -1,23 +1,25 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+import nodriver
 from pydantic import BaseModel
 
-from product_images_scraper import getImage
+from image_scraper import product_images
+
+class UrlFormat(BaseModel):
+    url : str
+
+class ImageList(BaseModel):
+    images : list
+
+
 app = FastAPI()
 
-class ImageUrls(BaseModel):
-    urls : list
-
-class ProductInformation(BaseModel):
-    url: str
-
-@app.post('/product/images')
-def get_images(info : ProductInformation) -> ImageUrls:
-    images = getImage(info.url)
-    out = ImageUrls(urls = images)
-    return out
+@app.post("/product_images")
+def get_images(url : UrlFormat):
+    out = nodriver.loop().run_until_complete(product_images(url.url))
+    images = ImageList(images = out)
+    return images
 
 
-if __name__ == "__main__":
-    uvicorn.run(app, host = "0.0.0.0", port= 8000)
+if __name__ == '__main__':
+    uvicorn.run(app, host = '0.0.0.0', port = 8000)

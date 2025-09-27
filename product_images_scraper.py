@@ -3,7 +3,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
 import cProfile
 import pstats
 
@@ -18,19 +17,24 @@ class CONFIG:
     max_threads : int = 12
 
 
-url = 'https://www.amazon.in/iPhone-16-128-GB-Control/dp/B0DGHZWBYB'
+url = 'https://www.amazon.in/Quaker-Oats-Pouch-1kg/dp/B00QPS8BAW'
 
 
-def driver_setup() -> webdriver.Chrome: 
+def driver_setup() -> webdriver.Chrome:
+
     options = webdriver.ChromeOptions()
     # options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument("--window-size=1920,1080") 
     options.add_argument("--start-maximized")
-    options.add_argument('--blink-settings=imagesEnabled=false') 
+    # options.add_argument('--blink-settings=imagesEnabled=false') 
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    options.add_experimental_option('useAutomationExtension', False)
+
     
-    driver = webdriver.Chrome(service = Service(ChromeDriverManager().install()), options = options)
+    driver = webdriver.Chrome(options = options)
+    
     return driver
 
 
@@ -42,7 +46,7 @@ def product_image(driver, url :str, thread : int) -> str | None:
     try:
         thumb = WebDriverWait(driver, 5).until(EC.element_to_be_clickable((By.ID, f'ivImage_{thread}')))
         thumb.click()
-        time.sleep(0.5)
+        time.sleep(2)
 
         img = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "ivLargeImage")))
         img_url = img.find_element(By.TAG_NAME, 'img').get_attribute('src')
